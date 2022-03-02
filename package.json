@@ -6,6 +6,7 @@
   "bin": "bin/main.ts",
   "scripts": {
     "start": "ts-node bin/main.ts",
+    "build": "tsc",
     "test": "jest"
   },
   "keywords": [],
