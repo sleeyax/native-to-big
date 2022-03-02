@@ -1,20 +1,10 @@
 import { Node, Project, SyntaxKind } from "ts-morph";
 import { mappings } from './mappings';
 
-const project = new Project();
-
-const fileText = 
-`
-const total = 1 + 2 + 3 - 1 / 2;
-`;
-
-const sourceFile = project.createSourceFile("source.ts", fileText);
-
 const getLiteralValueOrThrow = (node: Node) => node.asKindOrThrow(SyntaxKind.NumericLiteral).getLiteralValue();
 
 function traverseBinaryExpression(node: Node): string {
-  const firstChild = node.getFirstChild();
-  if (!firstChild) return '';
+  const firstChild = node.getFirstChildOrThrow();
 
   // TODO: maybe construct new AST nodes instead of working with text
   let result = firstChild.getKind() === SyntaxKind.BinaryExpression ? traverseBinaryExpression(firstChild) : ('Big(' + getLiteralValueOrThrow(firstChild) + ')');
@@ -35,15 +25,29 @@ function traverseBinaryExpression(node: Node): string {
 }
 
 function traverse(node: Node) {
-  switch (node.getKindName()) {
-    case 'BinaryExpression':
-      const result = traverseBinaryExpression(node);
-      console.log(result);
-      break;
-    default:
-      node.forEachChild(traverse);
-      break;
-  }
+  let result = '';
+
+  // TODO: merge modified code in place with original AST
+
+  node.forEachChild((child) => {
+    switch (child.getKind()) {
+      case SyntaxKind.BinaryExpression:
+        result += traverseBinaryExpression(child);
+        break;
+      default:
+        result += traverse(child);
+        break;
+    }
+  });
+
+  return result;
 }
 
-traverse(sourceFile);
+export default function convert(source: string) {
+  const isSourceFile = source.endsWith('.ts') || source.endsWith('.js');
+
+  const project = new Project();
+  const sourceFile = project.createSourceFile(!isSourceFile ? 'source.ts' : source, !isSourceFile ? source : undefined);
+
+  return traverse(sourceFile);
+}
