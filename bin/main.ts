@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
-import { name, version, description } from '../package.json';
+import { version, description } from '../package.json';
 import convert from '../src/converter';
 
 program
-  .name(name)
+  .name('n2b')
   .version(version)
   .description(description)
   .option('-s, --sources <glob pattern or source code>', 'source file(s) or code to convert')

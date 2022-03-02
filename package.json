@@ -1,9 +1,11 @@
 {
   "name": "native-to-big",
   "version": "0.0.1",
-  "description": "Convert native math expressions Big types from the big.js library",
+  "description": "Convert native math expressions to Big types from the big.js library",
   "main": "bin/main.ts",
-  "bin": "bin/main.ts",
+  "bin": {
+    "n2b": "bin/main.ts"
+  },
   "scripts": {
     "start": "ts-node bin/main.ts",
     "build": "tsc",
