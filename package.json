@@ -1,21 +1,27 @@
 {
   "name": "native-to-big",
   "version": "0.0.1",
-  "description": "Convert native math expressions to the big.js library",
-  "main": "src/index.js",
+  "description": "Convert native math expressions Big types from the big.js library",
+  "main": "bin/main.ts",
+  "bin": "bin/main.ts",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "ts-node bin/main.ts",
+    "test": "jest"
   },
   "keywords": [],
   "author": "Sleeyax",
   "license": "MIT",
   "dependencies": {
+    "commander": "^9.0.0",
     "ts-morph": "^13.0.3"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.3",
+    "@types/jest": "^27.4.1",
     "big.js": "^6.1.1",
-    "ts-node": "^10.6.0"
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^10.6.0",
+    "typescript": "^4.6.2"
   }
 }
