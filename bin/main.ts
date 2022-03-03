@@ -2,15 +2,18 @@
 
 import { program } from 'commander';
 import { version, description } from '../package.json';
-import convert from '../src/converter';
+import convert, { Options } from '../src/converter';
 
 program
   .name('n2b')
   .version(version)
   .description(description)
-  .option('-s, --sources <glob pattern or source code>', 'source file(s) or code to convert')
+  .usage('-s ./src/**/*.ts')
+  .option('-s, --source <glob pattern or source code>', 'source file(s) or code to convert')
+  .option('--prependNew', `explicitly append the 'new' keyword to the resulting Big`)
+  .option('--appendToNumber', 'convert the resulting Big to a number')
   .parse();
 
-const options: {sources: string} = program.opts();
+const {source, ...options}: Options = program.opts();
 
-console.log(convert(options.sources));
+console.log(convert(source, options));
