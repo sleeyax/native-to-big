@@ -78,6 +78,29 @@ describe('Convert comparisons', () => {
   });
 });
 
+describe('Convert Math library', () => {
+  test('it should convert Math.abs', () => {
+    const input = 'Math.abs(0 - 1)';
+    const output = 'Big(0).minus(1).abs()';
+    expect(convert(input)).toBe(output);
+  });
+
+  test('it should convert Math.sqrt', () => {
+    const input = 'Math.sqrt(2 * 2)';
+    const output = 'Big(2).times(2).sqrt()';
+    expect(convert(input)).toBe(output);
+  });
+
+  test('it should convert multiple Math operations', () => {
+    const input = `
+      const x = Math.sqrt(2 * 2);
+      const y = Math.abs(0 - 1 - 2 + 1);
+    `;
+    expect(convert(input)).toContain('Big(2).times(2).sqrt()');
+    expect(convert(input)).toContain('Big(0).minus(1).minus(2).plus(1).abs()');
+  });
+});
+
 test('it should include original source code', () => {
   const input = `
     const foo = 'bar';

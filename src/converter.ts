@@ -33,11 +33,17 @@ export class Converter {
     return node.asKindOrThrow(SyntaxKind.NumericLiteral).getLiteralValue();
   }
 
+  private createBig(content: string | number) {
+    let result = this.options.prependNew ? 'new ' : '';
+    result += `Big(${content})`;
+    return result;
+  }
+
   private traverseBinaryExpression(node: Node): string {
     const firstChild = node.getFirstChildOrThrow();
   
     // TODO: maybe construct new AST nodes instead of working with text
-    let result = firstChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(firstChild) : ((this.options.prependNew ? 'new ' : '') + 'Big(' + this.getLiteralValueOrThrow(firstChild) + ')');
+    let result = firstChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(firstChild) : this.createBig(this.getLiteralValueOrThrow(firstChild));
   
     const children = node.getChildren();
     for (let i = 1; i < children.length; i++) {
@@ -59,9 +65,25 @@ export class Converter {
       switch (child.getKind()) {
         case SyntaxKind.BinaryExpression:
           let result = this.traverseBinaryExpression(child);
+          
+          // check if the expression is wrapped in a method from the native 'Math' library
+          const parent = child.getParentIfKind(SyntaxKind.CallExpression);
+          const previousSibling = parent?.getChildAtIndexIfKind(0, SyntaxKind.PropertyAccessExpression);
+          if (previousSibling) { 
+            const method = previousSibling.getSymbol()?.getEscapedName();
+            
+            if (method == 'abs' || method == 'sqrt') {
+              // previousSibling?.replaceWithText((this.options.prependNew ? 'new ' : '') + 'Big');
+              result += `.${method}()`;
+            }
+          }
+
           if (this.options.appendToNumber)
             result += '.toNumber()';
-          child.replaceWithText(result);
+          
+          // modify the node in place
+          (parent ?? child).replaceWithText(result);
+
           break;
         default:
           this.traverse(child);
