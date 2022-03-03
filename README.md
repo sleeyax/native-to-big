@@ -7,6 +7,8 @@ Do you feel like an idiot for not noticing this issue sooner and now realize tha
 
 Then maybe this simple CLI tool (and library) may come to the rescue to convert your existing code to Bigs!
 
+This utility uses the [TypeScript compiler API](https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API) under the hood, so it should be fast enough for tooling.
+
 ## Installation
 Install the CLI application globally:
 
@@ -40,6 +42,9 @@ $ n2b -s 0.1 + 0.2
 $ n2b -s ./src/**/*.ts
 $ n2b --prependNew --appendToNumber --source '1 + 2 - 1 / 3 * 4'
 ```
+
+### References
+* [TypeScript AST viewer](https://ts-ast-viewer.com)
 
 ## TODO
 This project is still **WIP**. Basic conversions should work, but I'd like to (at least) add the following features and tests before considering it production ready:
