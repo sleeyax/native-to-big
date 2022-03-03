@@ -1,5 +1,5 @@
 import { Node, Project, SyntaxKind } from "ts-morph";
-import { mappings } from './mappings';
+import { mapSyntaxKind } from './mappings';
 
 const getLiteralValueOrThrow = (node: Node) => node.asKindOrThrow(SyntaxKind.NumericLiteral).getLiteralValue();
 
@@ -13,7 +13,7 @@ function traverseBinaryExpression(node: Node): string {
   for (let i = 1; i < children.length; i++) {
     const child = children[i];
 
-    const expr = mappings[child.getKind()];
+    const expr = mapSyntaxKind[child.getKind()];
     if (!expr) throw new Error(`Expression of kind '${child.getKindName()}' is not supported!`);
 
     const nextChild = children[++i];
@@ -25,22 +25,17 @@ function traverseBinaryExpression(node: Node): string {
 }
 
 function traverse(node: Node) {
-  let result = '';
-
-  // TODO: merge modified code in place with original AST
-
   node.forEachChild((child) => {
     switch (child.getKind()) {
       case SyntaxKind.BinaryExpression:
-        result += traverseBinaryExpression(child);
+        const result = traverseBinaryExpression(child);
+        child.replaceWithText(result);
         break;
       default:
-        result += traverse(child);
+        traverse(child);
         break;
     }
   });
-
-  return result;
 }
 
 export default function convert(source: string) {
@@ -48,6 +43,8 @@ export default function convert(source: string) {
 
   const project = new Project();
   const sourceFile = project.createSourceFile(!isSourceFile ? 'source.ts' : source, !isSourceFile ? source : undefined);
-
-  return traverse(sourceFile);
+  
+  traverse(sourceFile);
+  
+  return sourceFile.getFullText();
 }

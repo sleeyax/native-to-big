@@ -1,6 +1,6 @@
 import { SyntaxKind } from 'ts-morph';
 
-export const mappings: {[kind: number]: string} = {
+export const mapSyntaxKind: {[kind: number]: string} = {
   [SyntaxKind.MinusToken]: 'minus',
   [SyntaxKind.PlusToken]: 'plus',
   [SyntaxKind.SlashToken]: 'div',

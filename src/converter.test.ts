@@ -31,3 +31,13 @@ describe('Convert simple mathematical expressions', () => {
     expect(convert(input)).toBe(output);
   });
 });
+
+test('it should include original source code', () => {
+  const input = `
+    const foo = 'bar';
+    const baz = 1;
+    const expr = 1 + 1;
+  `;
+  expect(convert(input)).toContain(`const foo = 'bar';`);
+  expect(convert(input)).toContain(`const baz = 1;`);
+});
