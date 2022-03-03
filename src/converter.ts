@@ -1,11 +1,23 @@
-import { Node, Project, SyntaxKind } from "ts-morph";
+import { Node, Project, SourceFile, SyntaxKind } from "ts-morph";
 import { mapSyntaxKind } from './mappings';
 
 export type Options = {
   /**
-   * Source file(s) or code to convert.
+   * Source file paths or glob patterns to convert.
    */
-  source: string;
+  source?: string | readonly string[];
+
+  /**
+   * Raw source code to convert.
+   * 
+   * This code will be stored in a dummy file whose name is stored in the importable `sourceCodeFileName` const.
+   */
+  sourceCode?: string;
+
+  /**
+   * Import source files from given tsconfig.json.
+   */
+  sourceTsConfig?: string;
 
   /**
    * Whether to suffix `Big` with the `new` keyword.
@@ -20,7 +32,17 @@ export type Options = {
    * Disabled by default.
    */
   appendToNumber?: boolean;
+
+  /**
+   * Called when an input file has been transformed to Bigs.
+   */
+  onConverted: (file: SourceFile) => void;
 };
+
+/**
+ * The name of the filename when raw source code was given via the `sourceCode` option.
+ */
+export const sourceCodeFileName = 'n2b-source.ts';
 
 export class Converter {
   private readonly options: Options;
@@ -91,18 +113,26 @@ export class Converter {
   }
 
   convert() {
-    const source = this.options.source;
-    const isSourceFile = source.endsWith('.ts') || source.endsWith('.js');
-
     const project = new Project();
-    const sourceFile = project.createSourceFile(!isSourceFile ? 'source.ts' : source, !isSourceFile ? source : undefined);
     
-    this.traverse(sourceFile);
+    if (this.options.sourceCode)
+      project.createSourceFile(sourceCodeFileName, this.options.sourceCode);
+
+    if (this.options.source)
+      project.addSourceFilesAtPaths(this.options.source);
     
-    return sourceFile.getFullText();
+    if (this.options.sourceTsConfig)
+      project.addSourceFilesFromTsConfig(this.options.sourceTsConfig);
+
+    const files = project.getSourceFiles();
+
+    for (const file of files) {
+      this.traverse(file);
+      this.options.onConverted(file);
+    }
   }
 }
 
-export function convert(source: string, options?: Omit<Options, 'source'>) {
-  return new Converter({source, ...options}).convert();
+export function convert(options: Options) {
+  return new Converter(options).convert();
 }
