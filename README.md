@@ -65,5 +65,4 @@ $ n2b --prependNew --appendToNumber --sourceTsConfig ./tsconfig.json
 ## TODO
 This project is still **WIP**. I'd like to add the following tests before considering it production ready:
 - Test complex math
-- Test conversion of both TS and JS
 - Test conversion of big projects (e.g. NestJS)
