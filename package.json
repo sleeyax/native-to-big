@@ -1,6 +1,6 @@
 {
   "name": "native-to-big",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Convert native math expressions to Big types from the big.js library",
   "main": "build/src/index.js",
   "bin": {
