@@ -25,7 +25,7 @@ describe('Convert simple mathematical expressions', () => {
     expect(convert(input)).toBe(output);
   });
 
-  test('it should perform all simple expressions combined', () => {
+  test('it should convert all simple expressions combined', () => {
     const input = '1 + 2 - 3 * 4 / 5';
     const output = 'Big(1).plus(2).minus(Big(3).times(4).div(5))';
     expect(convert(input)).toBe(output);
