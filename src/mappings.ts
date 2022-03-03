@@ -5,9 +5,12 @@ export const mapSyntaxKind: {[kind: number]: string} = {
   [SyntaxKind.PlusToken]: 'plus',
   [SyntaxKind.SlashToken]: 'div',
   [SyntaxKind.AsteriskToken]: 'times',
-  [SyntaxKind.GreaterThanToken]: 'gt',
-  [SyntaxKind.LessThanToken]: 'lt',
   [SyntaxKind.PercentToken]: 'mod',
   [SyntaxKind.CaretToken]: 'pow',
-  // TODO: support more expressions
+  [SyntaxKind.EqualsEqualsEqualsToken]: 'eq',
+  [SyntaxKind.EqualsEqualsToken]: 'eq',
+  [SyntaxKind.LessThanToken]: 'lt',
+  [SyntaxKind.LessThanEqualsToken]: 'lte',
+  [SyntaxKind.GreaterThanToken]: 'gt',
+  [SyntaxKind.GreaterThanEqualsToken]: 'gte',
 };

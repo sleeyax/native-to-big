@@ -49,7 +49,6 @@ $ n2b --prependNew --appendToNumber --source '1 + 2 - 1 / 3 * 4'
 ## TODO
 This project is still **WIP**. Basic conversions should work, but I'd like to (at least) add the following features and tests before considering it production ready:
 - Convert and write to multiple files
-- Map expressions to all supported big methods
 - Test complex math
 - Test conversion of both TS and JS
 - Test conversion of big projects (e.g. NestJS)

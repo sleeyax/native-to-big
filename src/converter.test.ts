@@ -30,6 +30,52 @@ describe('Convert simple mathematical expressions', () => {
     const output = 'Big(1).plus(2).minus(Big(3).times(4).div(5))';
     expect(convert(input)).toBe(output);
   });
+
+  test('it should convert modulus', () => {
+    const input = '10 % 5';
+    const output = 'Big(10).mod(5)';
+    expect(convert(input)).toBe(output);
+  });
+
+  test('it should convert to the power', () => {
+    const input = '2 ^ 5';
+    const output = 'Big(2).pow(5)';
+    expect(convert(input)).toBe(output);
+  });
+});
+
+describe('Convert comparisons', () => {
+  test('it should convert equals', () => {
+    const inputs = ['1 + 1 == 2', '1 + 1 === 2'];
+    const output = 'Big(1).plus(1).eq(2)';
+    for (const input of inputs) {
+      expect(convert(input)).toBe(output);
+    }
+  });
+
+  test('it should convert greather than', () => {
+    const input = '1 + 1 > 2';
+    const output = 'Big(1).plus(1).gt(2)';
+    expect(convert(input)).toBe(output);
+  });
+
+  test('it should convert greather than or equals', () => {
+    const input = '1 + 1 >= 2';
+    const output = 'Big(1).plus(1).gte(2)';
+    expect(convert(input)).toBe(output);
+  });
+
+  test('it should convert less than', () => {
+    const input = '1 + 1 < 2';
+    const output = 'Big(1).plus(1).lt(2)';
+    expect(convert(input)).toBe(output);
+  });
+
+  test('it should convert less than or equals', () => {
+    const input = '1 + 1 <= 2';
+    const output = 'Big(1).plus(1).lte(2)';
+    expect(convert(input)).toBe(output);
+  });
 });
 
 test('it should include original source code', () => {
@@ -49,6 +95,5 @@ test('it should prepend new', () => {
 
 test('it should append toNumber()', () => {
   const input = '1 + 2 - 3';
-  console.log(convert(input, {appendToNumber: true}));
   expect(convert(input, {appendToNumber: true})).toMatch(/toNumber\(\)$/);
 });
