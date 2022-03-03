@@ -50,9 +50,6 @@ export class Converter {
   
       result += `.${expr}(${nextChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(nextChild) : this.getLiteralValueOrThrow(nextChild)})`;
     }
-
-    if (this.options.appendToNumber)
-      result += '.toNumber()';
   
     return result;
   }
@@ -61,7 +58,9 @@ export class Converter {
     node.forEachChild((child) => {
       switch (child.getKind()) {
         case SyntaxKind.BinaryExpression:
-          const result = this.traverseBinaryExpression(child);
+          let result = this.traverseBinaryExpression(child);
+          if (this.options.appendToNumber)
+            result += '.toNumber()';
           child.replaceWithText(result);
           break;
         default:
@@ -84,6 +83,6 @@ export class Converter {
   }
 }
 
-export default function convert(source: string, options?: Omit<Options, 'source'>) {
+export function convert(source: string, options?: Omit<Options, 'source'>) {
   return new Converter({source, ...options}).convert();
 }

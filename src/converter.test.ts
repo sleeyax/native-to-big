@@ -1,4 +1,4 @@
-import convert from './converter';
+import { convert } from './converter';
 
 describe('Convert simple mathematical expressions', () => {
   test('it should convert additions', () => {
@@ -48,6 +48,7 @@ test('it should prepend new', () => {
 });
 
 test('it should append toNumber()', () => {
-  const input = '1 - 1';
+  const input = '1 + 2 - 3';
+  console.log(convert(input, {appendToNumber: true}));
   expect(convert(input, {appendToNumber: true})).toMatch(/toNumber\(\)$/);
 });

@@ -21,7 +21,7 @@ Install the package locally, for programmatic purposes:
 ## Usage
 ### Library
 ```js
-import convert from 'native-to-big';
+import {convert} from 'native-to-big';
 
 const options = {prependNew: true, appendToNumber: true};
 const source = 'const nr = 1 + 2 - 3;';

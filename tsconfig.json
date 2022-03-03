@@ -12,4 +12,7 @@
     "./bin",
     "./src"
   ],
+  "exclude": [
+    "**/*.test.ts"
+  ]
 }

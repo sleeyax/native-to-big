@@ -2,7 +2,7 @@
   "name": "native-to-big",
   "version": "0.0.1",
   "description": "Convert native math expressions to Big types from the big.js library",
-  "main": "build/bin/main.js",
+  "main": "build/src/index.js",
   "bin": {
     "n2b": "build/bin/main.js"
   },

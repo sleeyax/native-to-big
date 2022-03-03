@@ -2,7 +2,7 @@
 
 import { program } from 'commander';
 import { version, description } from '../package.json';
-import convert, { Options } from '../src/converter';
+import { convert, Options } from '../src/converter';
 
 program
   .name('n2b')
