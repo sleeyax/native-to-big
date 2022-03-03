@@ -135,6 +135,27 @@ describe('Convert files', () => {
   });
 });
 
+describe('Convert non-literals', () => {
+  test('it should convert values returned from a function', () => {
+    const input = `
+      const x  = () => 1;
+      const y = () => 2;
+      x() + y() + 3;
+    `;
+    const output = 'Big(x()).plus(y()).plus(3)'
+    expect(convertCode(input)).toContain(output);
+  });
+
+  test('it should convert values returned from an object', () => {
+    const input = `
+      const obj  = {one: 1, two: 2};
+      obj.one + obj.two;
+    `;
+    const output = 'Big(obj.one).plus(obj.two)'
+    expect(convertCode(input)).toContain(output);
+  });
+});
+
 test('it should include original source code', () => {
   const input = `
     const foo = 'bar';

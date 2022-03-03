@@ -51,10 +51,6 @@ export class Converter {
     this.options = options;
   }
 
-  private getLiteralValueOrThrow(node: Node){
-    return node.asKindOrThrow(SyntaxKind.NumericLiteral).getLiteralValue();
-  }
-
   private createBig(content: string | number) {
     let result = this.options.prependNew ? 'new ' : '';
     result += `Big(${content})`;
@@ -65,7 +61,7 @@ export class Converter {
     const firstChild = node.getFirstChildOrThrow();
   
     // TODO: maybe construct new AST nodes instead of working with text
-    let result = firstChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(firstChild) : this.createBig(this.getLiteralValueOrThrow(firstChild));
+    let result = firstChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(firstChild) : this.createBig(firstChild.getText());
   
     const children = node.getChildren();
     for (let i = 1; i < children.length; i++) {
@@ -76,7 +72,7 @@ export class Converter {
   
       const nextChild = children[++i];
   
-      result += `.${expr}(${nextChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(nextChild) : this.getLiteralValueOrThrow(nextChild)})`;
+      result += `.${expr}(${nextChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(nextChild) : nextChild.getText()})`;
     }
   
     return result;
