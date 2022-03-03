@@ -2,3 +2,4 @@ src/
 bin/
 *.config.js
 tsconfig.json
+tests/data/
