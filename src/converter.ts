@@ -72,17 +72,15 @@ export class Converter {
           if (previousSibling) { 
             const method = previousSibling.getSymbol()?.getEscapedName();
             
-            if (method == 'abs' || method == 'sqrt') {
-              // previousSibling?.replaceWithText((this.options.prependNew ? 'new ' : '') + 'Big');
+            if (method == 'abs' || method == 'sqrt')
               result += `.${method}()`;
-            }
           }
 
           if (this.options.appendToNumber)
             result += '.toNumber()';
           
           // modify the node in place
-          (parent ?? child).replaceWithText(result);
+          (previousSibling ? parent! : child).replaceWithText(result);
 
           break;
         default:
