@@ -41,3 +41,13 @@ test('it should include original source code', () => {
   expect(convert(input)).toContain(`const foo = 'bar';`);
   expect(convert(input)).toContain(`const baz = 1;`);
 });
+
+test('it should prepend new', () => {
+  const input = '1 - 1';
+  expect(convert(input, {prependNew: true})).toMatch(/^new/);
+});
+
+test('it should append toNumber()', () => {
+  const input = '1 - 1';
+  expect(convert(input, {appendToNumber: true})).toMatch(/toNumber\(\)$/);
+});
