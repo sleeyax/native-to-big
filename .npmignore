@@ -1,0 +1,4 @@
+src/
+bin/
+*.config.js
+tsconfig.json

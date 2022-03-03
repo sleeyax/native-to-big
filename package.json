@@ -2,9 +2,9 @@
   "name": "native-to-big",
   "version": "0.0.1",
   "description": "Convert native math expressions to Big types from the big.js library",
-  "main": "bin/main.ts",
+  "main": "build/bin/main.js",
   "bin": {
-    "n2b": "bin/main.ts"
+    "n2b": "build/bin/main.js"
   },
   "scripts": {
     "start": "ts-node bin/main.ts",
@@ -22,6 +22,10 @@
   ],
   "author": "Sleeyax",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sleeyax/native-to-big"
+  },
   "dependencies": {
     "commander": "^9.0.0",
     "ts-morph": "^13.0.3"

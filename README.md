@@ -1,11 +1,11 @@
 # n2b
-Do you know that `0.1 + 0.2 == 0.3` equals `false` in JavaScript?
+Do you know that `0.1 + 0.2 == 0.3` equals `false` in JavaScript ([see this useful article](https://www.codemag.com/article/1811041/JavaScript-Corner-Math-and-the-Pitfalls-of-Floating-Point-Numbers))?
 
 Do you also know that packages like [Big.js](https://www.npmjs.com/package/big.js) exists to deal with exact number issues like this?
 
-Do you feel like an idiot for not noticing this issue sooner and now realize that your whole code base is fucked (totally didn't happen to me btw)?
+Do you feel like an idiot for not noticing this issue sooner and now realize that your whole codebase is fucked (totally didn't happen to me btw)?
 
-Then maybe this simple CLI tool (and library) may help to convert your existing code to Bigs!
+Then maybe this simple CLI tool (and library) may come to the rescue to convert your existing code to Bigs!
 
 ## Installation
 Install the CLI application globally:

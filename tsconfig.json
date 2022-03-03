@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2018",
     "module": "commonjs",
-    "lib": ["es6", "es2015"],
+    "lib": ["es2018"],
     "declaration": true,
     "outDir": "build",
     "strict": true,
