@@ -156,6 +156,44 @@ describe('Convert non-literals', () => {
   });
 });
 
+describe('Convert assignments', () => {
+  test('it should wrap one-value assignments into Bigs when configured', () => {
+    const input = 'let total = 0';
+    const output = 'let total = Big(0)';
+    expect(convertCode(input, {variables: ['total']})).toBe(output);
+  });
+
+  test('it should convert addition assingment', () => {
+    const input = 'let total = 0; total += 1 + 2;';
+    const output = 'let total = Big(0); total = total.plus(Big(1).plus(2));';
+    expect(convertCode(input, {variables: ['total']})).toBe(output);
+  });
+
+  test('it should convert substraction assingment', () => {
+    const input = 'let total = 0; total -= 1 + 2;';
+    const output = 'let total = Big(0); total = total.minus(Big(1).plus(2));';
+    expect(convertCode(input, {variables: ['total']})).toBe(output);
+  });
+
+  test('it should convert multiplication assingment', () => {
+    const input = 'let total = 0; total *= 1 + 2;';
+    const output = 'let total = Big(0); total = total.times(Big(1).plus(2));';
+    expect(convertCode(input, {variables: ['total']})).toBe(output);
+  });
+
+  test('it should convert division assingment', () => {
+    const input = 'let total = 0; total /= 1 + 2;';
+    const output = 'let total = Big(0); total = total.div(Big(1).plus(2));';
+    expect(convertCode(input, {variables: ['total']})).toBe(output);
+  });
+
+  test('it should convert remainder assingment', () => {
+    const input = 'let total = 0; total %= 1 + 2;';
+    const output = 'let total = Big(0); total = total.mod(Big(1).plus(2));';
+    expect(convertCode(input, {variables: ['total']})).toBe(output);
+  });
+});
+
 test('it should include original source code', () => {
   const input = `
     const foo = 'bar';

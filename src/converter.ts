@@ -34,6 +34,28 @@ export type Options = {
   appendToNumber?: boolean;
 
   /**
+   * List of one-value variables to wrap in a Big.
+   * 
+   * By default, all variables containg a constant number won't be wrapped in a Big.
+   * 
+   * For example, the following code:
+   * ```js
+   * let total = 0;
+   * total += 1 + 2;
+   * ```
+   * 
+   * Will, by default, result in the following faulty code after conversion:
+   * ```js
+   * let total = 0;
+   * total = total.add(Big(1).plus(2));
+   * ```
+   * 
+   * This is done by design so that we don't convert important values like constants or incrementers (let i = 0).
+   * Thus, in order to fix the example above you should specify `{..., variables: ['total']}` in your `Options` object..
+   */
+  variables?: string[];
+
+  /**
    * Called when an input file has been transformed to Bigs.
    */
   onConverted: (file: SourceFile) => void;
@@ -58,10 +80,36 @@ export class Converter {
   }
 
   private traverseBinaryExpression(node: Node): string {
+    let result = '';
+    
     const firstChild = node.getFirstChildOrThrow();
-  
-    // TODO: maybe construct new AST nodes instead of working with text
-    let result = firstChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(firstChild) : this.createBig(firstChild.getText());
+
+    switch (firstChild.getKind()) {
+      case SyntaxKind.BinaryExpression:
+        result = this.traverseBinaryExpression(firstChild);
+        break;
+      case SyntaxKind.Identifier:
+        const secondChild = node.getChildAtIndex(1);
+
+        switch (secondChild.getKind()) {
+          case SyntaxKind.MinusEqualsToken:
+          case SyntaxKind.PlusEqualsToken:
+          case SyntaxKind.SlashEqualsToken:
+          case SyntaxKind.AsteriskEqualsToken:
+          case SyntaxKind.PercentEqualsToken:
+            const identifierText = firstChild.asKindOrThrow(SyntaxKind.Identifier).getText();
+            result = `${identifierText} = ${identifierText}`; // e.g. 'total +=' -> 'total = total' (and then '.plus(...)' gets added later on)
+            break;
+          default:
+            result = this.createBig(firstChild.getText());
+            break;
+        }
+
+        break;
+      default:
+        result = this.createBig(firstChild.getText());
+        break;
+    }
   
     const children = node.getChildren();
     for (let i = 1; i < children.length; i++) {
@@ -101,6 +149,17 @@ export class Converter {
           (previousSibling ? parent! : child).replaceWithText(result);
 
           break;
+        case SyntaxKind.VariableDeclaration:
+          // find single-value variable declarations like 'let total = 0'
+          const variables = this.options.variables;
+          if (variables?.length && child.getChildCount() == 3) {
+            const identifier = child.getChildAtIndexIfKind(0, SyntaxKind.Identifier);
+            const numericLiteral = child.getChildAtIndexIfKind(2, SyntaxKind.NumericLiteral);
+            if (identifier && numericLiteral && variables.includes(identifier.getText())) {
+              numericLiteral.replaceWithText(this.createBig(numericLiteral.getLiteralValue()));
+              break;
+            }
+          }
         default:
           this.traverse(child);
           break;

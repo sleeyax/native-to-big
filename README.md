@@ -26,10 +26,12 @@ import { convert } from 'native-to-big';
 // convert raw code & log the result to console
 convert({
   sourceCode: 'const nr = 1 + 2 - 3;', 
-  prependNew: true, 
-  appendToNumber: true,
+  prependNew: true,      // write 'new Big()' instead of 'Big()'
+  appendToNumber: true,  // append '.toNumber()' at the end of each Big
+  variables: ['total'],  // transforms 'let total = 0' to 'let total = Big(0)' whenever a variabe named 'total' is found
   onConverted: (file) => {
-    console.log(file.getFullText(); // output: const nr = new Big(1).plus(2).minus(3).toNumber();
+    console.log(file.getFullText();
+    // output: const nr = new Big(1).plus(2).minus(3).toNumber();
   },
 });
 
@@ -56,7 +58,7 @@ Examples:
 ```
 $ n2b -sc 0.1 + 0.2
 $ n2b -s ./src/**/*.ts --dryRun
-$ n2b --prependNew --appendToNumber --sourceTsConfig ./tsconfig.json
+$ n2b --prependNew --appendToNumber --variables total,sum --sourceTsConfig ./tsconfig.json
 ```
 
 ### References

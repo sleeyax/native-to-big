@@ -14,6 +14,7 @@ program
   .option('-stc, --sourceTsConfig <tsconfig.json>', 'path to tsconfig.json to use for conversion')
   .option('--prependNew', `explicitly append the 'new' keyword to the resulting Big`)
   .option('--appendToNumber', 'convert the resulting Big to a number')
+  .option('-vars, --variables <variables...>', 'name(s) of single-value variable(s) to wrap in Big(s)')
   .option('--dryRun', 'log to console instead of writing to disk')
   .parse();
 
