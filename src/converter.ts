@@ -135,20 +135,24 @@ export class Converter {
           // check if the expression is wrapped in a method from the native 'Math' library
           const parent = child.getParentIfKind(SyntaxKind.CallExpression);
           const previousSibling = parent?.getChildAtIndexIfKind(0, SyntaxKind.PropertyAccessExpression);
+          let foundMath = false;
           if (previousSibling) { 
             const method = previousSibling.getSymbol()?.getEscapedName();
             
-            if (method == 'abs' || method == 'sqrt')
+            if (method == 'abs' || method == 'sqrt') {
               result += `.${method}()`;
-            else if (method === 'pow') // TODO: support Math.pow(value, power)
-              throw new Error('Math.pow isn\'t supported!');
+              foundMath = true;
+            }
+            else if (method === 'pow')
+              // TODO: support Math.pow(value, power)
+              console.warn(`Found Math.pow in ${child.getSourceFile().getFilePath()}:${child.getStartLineNumber()} but it isn\'t supported! Skipping...`);
           }
 
           if (this.options.appendToNumber)
             result += '.toNumber()';
           
           // modify the node in place
-          (previousSibling ? parent! : child).replaceWithText(result);
+          (foundMath ? parent! : child).replaceWithText(result);
 
           break;
         case SyntaxKind.VariableDeclaration:

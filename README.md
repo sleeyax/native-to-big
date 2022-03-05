@@ -61,5 +61,11 @@ $ n2b -s ./src/**/*.ts --dryRun
 $ n2b --prependNew --appendToNumber --variables total,sum --sourceTsConfig ./tsconfig.json
 ```
 
+### Missing features
+These features are currently missing but could potentially be added in the future. Feel free to contribute!
+
+- Doesn't support conversion of `Math.pow`. `Math.sqrt` and `Math.abs` are supported though. A warning will be logged to console whenever it's found and it will be ignored.
+- Operator precedence is accounted for but isn't optimized. E.g the following expression `(3 + 10) * (2 - 5)` will end up being converted to `Big((3 + 10)).times((2 - 5))`.
+
 ### References
 * [TypeScript AST viewer](https://ts-ast-viewer.com)
