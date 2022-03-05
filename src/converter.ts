@@ -140,6 +140,8 @@ export class Converter {
             
             if (method == 'abs' || method == 'sqrt')
               result += `.${method}()`;
+            else if (method === 'pow') // TODO: support Math.pow(value, power)
+              throw new Error('Math.pow isn\'t supported!');
           }
 
           if (this.options.appendToNumber)

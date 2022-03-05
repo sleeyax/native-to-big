@@ -1,4 +1,6 @@
 import { convert, Options } from './converter';
+import Big from 'big.js';
+import {runInNewContext as evalInVm} from 'vm';
 
 const testData = './tests/data/';
 
@@ -14,47 +16,49 @@ const convertFiles = (files: string | readonly string[]) => {
   return output;
 };
 
+const cmp = (expr: string, big: string, toNumber = false) => evalInVm(expr) === evalInVm(big + (toNumber ? '.toNumber()' : ''), {Big})
+
 describe('Convert simple mathematical expressions', () => {
   test('it should convert additions', () => {
     const input = '1 + 2 + 3 + 4 + 5';
     const output = 'Big(1).plus(2).plus(3).plus(4).plus(5)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
 
   test('it should convert substractions', () => {
     const input = '5 - 4 - 3 - 2 - 1';
     const output = 'Big(5).minus(4).minus(3).minus(2).minus(1)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
 
   test('it should convert multiplications', () => {
     const input = '1 * 2 * 3 * 4 * 5';
     const output = 'Big(1).times(2).times(3).times(4).times(5)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
 
   test('it should convert divisions', () => {
     const input = '5 / 4 / 3 / 2 / 1';
     const output = 'Big(5).div(4).div(3).div(2).div(1)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
 
   test('it should convert all simple expressions combined', () => {
-    const input = '1 + 2 - 3 * 4 / 5';
+    const input = '1 + 2 - 3 * 4 / 5'; // 0.6000000000000001
     const output = 'Big(1).plus(2).minus(Big(3).times(4).div(5))';
     expect(convertCode(input)).toBe(output);
+    expect(cmp('0.6', output, true)).toBe(true);
   });
 
   test('it should convert modulus', () => {
     const input = '10 % 5';
     const output = 'Big(10).mod(5)';
     expect(convertCode(input)).toBe(output);
-  });
-
-  test('it should convert to the power', () => {
-    const input = '2 ^ 5';
-    const output = 'Big(2).pow(5)';
-    expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
 });
 
@@ -64,6 +68,7 @@ describe('Convert comparisons', () => {
     const output = 'Big(1).plus(1).eq(2)';
     for (const input of inputs) {
       expect(convertCode(input)).toBe(output);
+      expect(cmp(input, output)).toBe(true);
     }
   });
 
@@ -71,24 +76,28 @@ describe('Convert comparisons', () => {
     const input = '1 + 1 > 2';
     const output = 'Big(1).plus(1).gt(2)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output)).toBe(true);
   });
 
   test('it should convert greather than or equals', () => {
     const input = '1 + 1 >= 2';
     const output = 'Big(1).plus(1).gte(2)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output)).toBe(true);
   });
 
   test('it should convert less than', () => {
     const input = '1 + 1 < 2';
     const output = 'Big(1).plus(1).lt(2)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output)).toBe(true);
   });
 
   test('it should convert less than or equals', () => {
     const input = '1 + 1 <= 2';
     const output = 'Big(1).plus(1).lte(2)';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output)).toBe(true);
   });
 });
 
@@ -97,13 +106,21 @@ describe('Convert Math library', () => {
     const input = 'Math.abs(0 - 1)';
     const output = 'Big(0).minus(1).abs()';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
 
   test('it should convert Math.sqrt', () => {
     const input = 'Math.sqrt(2 * 2)';
     const output = 'Big(2).times(2).sqrt()';
     expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
+
+  /* test('it should convert Math.pow', () => {
+    const input = 'Math.pow(2, 2)';
+    const output = 'Big(2).pow(2)';
+    expect(convertCode(input)).toBe(output);
+  }); */
 
   test('it should convert multiple Math operations', () => {
     const input = `
@@ -154,6 +171,13 @@ describe('Convert non-literals', () => {
     const output = 'Big(obj.one).plus(obj.two)'
     expect(convertCode(input)).toContain(output);
   });
+
+  test('it should convert unary expressions', () => {
+    const input = '1 + 2 + +"3"';
+    const output = 'Big(1).plus(2).plus(+"3")';
+    expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
+  });
 });
 
 describe('Convert assignments', () => {
@@ -161,6 +185,7 @@ describe('Convert assignments', () => {
     const input = 'let total = 0';
     const output = 'let total = Big(0)';
     expect(convertCode(input, {variables: ['total']})).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
   });
 
   test('it should convert addition assingment', () => {

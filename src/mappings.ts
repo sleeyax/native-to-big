@@ -11,7 +11,6 @@ export const mapSyntaxKind: {[kind: number]: string} = {
   [SyntaxKind.AsteriskEqualsToken]: 'times',
   [SyntaxKind.PercentToken]: 'mod',
   [SyntaxKind.PercentEqualsToken]: 'mod',
-  [SyntaxKind.CaretToken]: 'pow',
   [SyntaxKind.EqualsEqualsEqualsToken]: 'eq',
   [SyntaxKind.EqualsEqualsToken]: 'eq',
   [SyntaxKind.LessThanToken]: 'lt',

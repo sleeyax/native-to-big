@@ -63,8 +63,3 @@ $ n2b --prependNew --appendToNumber --variables total,sum --sourceTsConfig ./tsc
 
 ### References
 * [TypeScript AST viewer](https://ts-ast-viewer.com)
-
-## TODO
-This project is still **WIP**. I'd like to add the following tests before considering it production ready:
-- Test complex math
-- Test conversion of big projects (e.g. NestJS)
