@@ -30,7 +30,7 @@ convert({
   appendToNumber: true,  // append '.toNumber()' at the end of each Big
   variables: ['total'],  // transforms 'let total = 0' to 'let total = Big(0)' whenever a variabe named 'total' is found
   onConverted: (file) => {
-    console.log(file.getFullText();
+    console.log(file.getFullText());
     // output: const nr = new Big(1).plus(2).minus(3).toNumber();
   },
 });
