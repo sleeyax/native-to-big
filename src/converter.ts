@@ -88,61 +88,55 @@ export class Converter {
 
   private traverseBinaryExpression(node: Node): string {
     let result = '';
-    
-    const firstChild = node.getFirstChildOrThrow();
-
-    switch (firstChild.getKind()) {
-      case SyntaxKind.BinaryExpression:
-        result = this.traverseBinaryExpression(firstChild);
-        break;
-      case SyntaxKind.Identifier:
-        const secondChild = node.getChildAtIndex(1);
-
-        switch (secondChild.getKind()) {
-          case SyntaxKind.MinusEqualsToken:
-          case SyntaxKind.PlusEqualsToken:
-          case SyntaxKind.SlashEqualsToken:
-          case SyntaxKind.AsteriskEqualsToken:
-          case SyntaxKind.PercentEqualsToken:
-            const identifierText = firstChild.asKindOrThrow(SyntaxKind.Identifier).getText();
-            result = `${identifierText} = ${identifierText}`; // e.g. 'total +=' -> 'total = total' (and then '.plus(...)' gets added later on)
-            break;
-          default:
-            result = this.createBig(firstChild.getText());
-            break;
-        }
-
-        break;
-      case SyntaxKind.ParenthesizedExpression:
-        result = this.createBig(this.traverseParenthesizedExpression(firstChild));
-        break;
-      default:
-        result = this.createBig(firstChild.getText());
-        break;
-    }
   
     const children = node.getChildren();
-    for (let i = 1; i < children.length; i++) {
-      const child = children[i];
-  
-      const expr = mapSyntaxKind[child.getKind()];
-      if (!expr) throw new Error(`Expression of kind '${child.getKindName()}' is not supported!`);
-  
-      const nextChild = children[++i];
-  
+    for (let i = 0; i < children.length; i++) {
+      let child = children[i];
       let content = '';
-      switch (nextChild.getKind()) {
+
+      switch (child.getKind()) {
         case SyntaxKind.BinaryExpression:
-          content = this.traverseBinaryExpression(nextChild);
+          content = this.traverseBinaryExpression(child);
+          break;
+        case SyntaxKind.Identifier:
+          const secondChild = node.getChildAtIndex(1);
+  
+          switch (secondChild.getKind()) {
+            case SyntaxKind.MinusEqualsToken:
+            case SyntaxKind.PlusEqualsToken:
+            case SyntaxKind.SlashEqualsToken:
+            case SyntaxKind.AsteriskEqualsToken:
+            case SyntaxKind.PercentEqualsToken:
+              const identifierText = child.asKindOrThrow(SyntaxKind.Identifier).getText();
+              content = `${identifierText} = ${identifierText}`; // e.g. 'total +=' -> 'total = total' (and then '.plus(...)' gets added later on)
+              break;
+            default:
+              content = i == 0 ? this.createBig(child.getText()) : child.getText();
+              break;
+          }
+  
           break;
         case SyntaxKind.ParenthesizedExpression:
-          content = this.traverseParenthesizedExpression(nextChild);
+          content = i == 0 ? this.createBig(this.traverseParenthesizedExpression(child)) : this.traverseParenthesizedExpression(child);
           break;
         default:
-          content = nextChild.getText();
+          content = i == 0 ? this.createBig(child.getText()) : child.getText();
           break;
       }
-      result += `.${expr}(${content})`;
+      
+      if (i == 0) {
+        result += content;
+      }
+      else if (i == 1) {
+        const expr = mapSyntaxKind[child.getKind()];
+        if (!expr) throw new Error(`Expression of kind '${child.getKindName()}' is not supported!`);
+        result += '.' + expr;
+      } else if (i == 2) {
+        result +=  `(${content})`;
+      } else {
+        // NOTE: this line shouldn't be reachable but let's append content instead of throwing an error
+        result += content;
+      }
     }
   
     return result;
