@@ -38,13 +38,11 @@ convert({
 // convert multiple files & write them to disk
 convert({
   source: ['./src/**/*{.js,.ts}', './bin/main.ts'], 
-  onConverted: (file) => file.saveSync()),
 });
 
 // convert multiple files from another TypeScript project & write them to disk
 convert({
   sourceTsConfig: '/path/to/project/tsconfig.json',
-  onConverted: (file) => file.saveSync()),
 });
 ```
 

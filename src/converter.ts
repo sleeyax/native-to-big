@@ -57,8 +57,10 @@ export type Options = {
 
   /**
    * Called when an input file has been transformed to Bigs.
+   * 
+   * Saves the input file to disk by default.
    */
-  onConverted: (file: SourceFile) => void;
+  onConverted?: (file: SourceFile) => void;
 };
 
 /**
@@ -211,6 +213,9 @@ export class Converter {
     
     if (this.options.sourceTsConfig)
       project.addSourceFilesFromTsConfig(this.options.sourceTsConfig);
+    
+    if (!this.options.onConverted)
+      this.options.onConverted = (file) => file.saveSync();
 
     const files = project.getSourceFiles();
 
