@@ -1,7 +1,7 @@
 # n2b
 Did you know that `0.1 + 0.2 == 0.3` equals `false` in JavaScript ([see this useful article](https://www.codemag.com/article/1811041/JavaScript-Corner-Math-and-the-Pitfalls-of-Floating-Point-Numbers))?
 
-Did you also know that packages like [Big.js](https://www.npmjs.com/package/big.js) exists to deal with exact number issues like this?
+Did you also know that packages like [Big.js](https://www.npmjs.com/package/big.js) exist to deal with exact number issues like this?
 
 Do you feel like an idiot for not noticing this issue sooner and now realize that your whole codebase is fucked (totally didn't happen to me btw)?
 
@@ -62,10 +62,9 @@ $ n2b --prependNew --appendToNumber --variables total,sum --sourceTsConfig ./tsc
 ```
 
 ### Missing features
-These features are currently missing but could potentially be added in the future. Feel free to contribute!
+These features are currently missing. Feel free to contribute!
 
 - Doesn't support conversion of `Math.pow`. `Math.sqrt` and `Math.abs` are supported though. A warning will be logged to console whenever it's found and it will be ignored.
-- Operator precedence is accounted for but isn't optimized. E.g the following expression `(3 + 10) * (2 - 5)` will end up being converted to `Big((3 + 10)).times((2 - 5))`.
 
 ### References
 * [TypeScript AST viewer](https://ts-ast-viewer.com)

@@ -79,6 +79,11 @@ export class Converter {
     return result;
   }
 
+  private traverseParenthesizedExpression(node: Node) {
+    const binaryExpression = node.getChildAtIndexIfKindOrThrow(1, SyntaxKind.BinaryExpression); // index: 0 == OpenParenToken, 2 == CloseParenToken
+    return this.traverseBinaryExpression(binaryExpression);
+  }
+
   private traverseBinaryExpression(node: Node): string {
     let result = '';
     
@@ -106,6 +111,9 @@ export class Converter {
         }
 
         break;
+      case SyntaxKind.ParenthesizedExpression:
+        result = this.createBig(this.traverseParenthesizedExpression(firstChild));
+        break;
       default:
         result = this.createBig(firstChild.getText());
         break;
@@ -120,7 +128,19 @@ export class Converter {
   
       const nextChild = children[++i];
   
-      result += `.${expr}(${nextChild.getKind() === SyntaxKind.BinaryExpression ? this.traverseBinaryExpression(nextChild) : nextChild.getText()})`;
+      let content = '';
+      switch (nextChild.getKind()) {
+        case SyntaxKind.BinaryExpression:
+          content = this.traverseBinaryExpression(nextChild);
+          break;
+        case SyntaxKind.ParenthesizedExpression:
+          content = this.traverseParenthesizedExpression(nextChild);
+          break;
+        default:
+          content = nextChild.getText();
+          break;
+      }
+      result += `.${expr}(${content})`;
     }
   
     return result;
@@ -165,6 +185,13 @@ export class Converter {
               numericLiteral.replaceWithText(this.createBig(numericLiteral.getLiteralValue()));
               break;
             }
+          }
+        case SyntaxKind.ParenthesizedExpression:
+          const firstChild = child.getFirstChildIfKind(SyntaxKind.BinaryExpression);
+          if (firstChild) {
+            const result = this.traverseBinaryExpression(firstChild);
+            child.replaceWithText(result);
+            break;
           }
         default:
           this.traverse(child);

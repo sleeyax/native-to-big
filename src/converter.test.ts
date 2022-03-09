@@ -239,20 +239,13 @@ test('it should append toNumber()', () => {
   expect(convertCode(input, {appendToNumber: true})).toMatch(/toNumber\(\)$/);
 });
 
-test('it should convert parentheses', () => {
-  // TODO: properly convert parenthesis
-  // possible approach:
-  // 1. detect start of opening parenthesis
-  // 2. extract inner expression
-  // 3. separately convert it to big
-  // 4. put resulting object back in its original place
-  // E.g: (3 + 10) * 2 -> Big(Big(3).plus(10)).times(2)
+test('it should convert parenthesis', () => {
   const tests: Record<string, string> = {
-    '(3 + 10) * 2': 'Big((3 + 10)).times(2)',                   // 26
-    '3 + (10 * 2)': 'Big(3).plus((10 * 2))',                    // 23
-    '3 + 10 * 2': 'Big(3).plus(Big(10).times(2))',              // 23
-    '(3 + 10) * (2 - 5)': 'Big((3 + 10)).times((2 - 5))',       // -39
-    '3 + 10 * 2 - 5': 'Big(3).plus(Big(10).times(2)).minus(5)', // 18
+    '(3 + 10) * 2': 'Big(Big(3).plus(10)).times(2)',                      // 26
+    '3 + (10 * 2)': 'Big(3).plus(Big(10).times(2))',                      // 23
+    '3 + 10 * 2': 'Big(3).plus(Big(10).times(2))',                        // 23
+    '(3 + 10) * (2 - 5)': 'Big(Big(3).plus(10)).times(Big(2).minus(5))', // -39
+    '3 + 10 * 2 - 5': 'Big(3).plus(Big(10).times(2)).minus(5)',           // 18
   };
   for (const input in tests) {
     const output = tests[input];
