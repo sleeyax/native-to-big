@@ -70,3 +70,8 @@ These features are currently missing. Feel free to contribute!
 
 ### References
 * [TypeScript AST viewer](https://ts-ast-viewer.com)
+
+### Other packages
+Other useful packages that are worth a mention:
+
+* [bigjs-literal](https://www.npmjs.com/package/bigjs-literal)
