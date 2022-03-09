@@ -1,4 +1,5 @@
 import { Node, Project, SourceFile, SyntaxKind } from "ts-morph";
+import { isPromise } from 'util/types';
 import { mapSyntaxKind } from './mappings';
 
 export type Options = {
@@ -54,14 +55,12 @@ export type Options = {
    * Thus, in order to fix the example above you should specify `{..., variables: ['total']}` in your `Options` object..
    */
   variables?: string[];
-
-  /**
-   * Called when an input file has been transformed to Bigs.
-   * 
-   * Saves the input file to disk by default.
-   */
-  onConverted?: (file: SourceFile) => void;
 };
+
+/**
+ * Function to call when an input file has been converted to Bigs.
+ */
+type OnConverted = (file: SourceFile) => void | Promise<void>;
 
 /**
  * The name of the filename when raw source code was given via the `sourceCode` option.
@@ -70,9 +69,20 @@ export const sourceCodeFileName = 'n2b-source.ts';
 
 export class Converter {
   private readonly options: Options;
+  private readonly project: Project;
 
   constructor(options: Options) {
+    this.project = new Project();
     this.options = options;
+    
+    if (options.sourceCode)
+      this.project.createSourceFile(sourceCodeFileName, options.sourceCode);
+
+    if (options.source)
+      this.project.addSourceFilesAtPaths(options.source);
+    
+    if (options.sourceTsConfig)
+      this.project.addSourceFilesFromTsConfig(options.sourceTsConfig);
   }
 
   private createBig(content: string | number) {
@@ -196,30 +206,27 @@ export class Converter {
     });
   }
 
-  convert() {
-    const project = new Project();
-    
-    if (this.options.sourceCode)
-      project.createSourceFile(sourceCodeFileName, this.options.sourceCode);
-
-    if (this.options.source)
-      project.addSourceFilesAtPaths(this.options.source);
-    
-    if (this.options.sourceTsConfig)
-      project.addSourceFilesFromTsConfig(this.options.sourceTsConfig);
-    
-    if (!this.options.onConverted)
-      this.options.onConverted = (file) => file.saveSync();
-
-    const files = project.getSourceFiles();
+  convert(onConverted: OnConverted = (file) => file.saveSync()) {
+    const files = this.project.getSourceFiles();
 
     for (const file of files) {
       this.traverse(file);
-      this.options.onConverted(file);
+      onConverted(file);
+    }
+  }
+
+  async convertAsync(onConverted: OnConverted = (file) => file.save()) {
+    const files = this.project.getSourceFiles();
+
+    for (const file of files) {
+      this.traverse(file);
+      await onConverted(file);
     }
   }
 }
 
-export function convert(options: Options) {
-  return new Converter(options).convert();
+export function convert({onConverted, ...options}: Options & {onConverted?: OnConverted}) {
+  const converter = new Converter(options);
+  const async = isPromise(onConverted);
+  return async ? converter.convertAsync(onConverted) : converter.convert(onConverted);
 }

@@ -38,12 +38,16 @@ convert({
 // convert multiple files & write them to disk
 convert({
   source: ['./src/**/*{.js,.ts}', './bin/main.ts'], 
+  onConverted: (file) => file.saveSync()
 });
 
-// convert multiple files from another TypeScript project & write them to disk
+// convert multiple files from a TypeScript project & asynchronously write them to disk
 convert({
   sourceTsConfig: '/path/to/project/tsconfig.json',
-});
+  onConverted: async (file) => file.save()
+})
+  .then(() => console.log('All files written successfully!'))
+  .catch(console.error);
 ```
 
 ### CLI

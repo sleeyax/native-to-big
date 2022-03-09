@@ -4,15 +4,19 @@ import {runInNewContext as evalInVm} from 'vm';
 
 const testData = './tests/data/';
 
-const convertCode = (code: string, options?: Omit<Options, 'onConverted'>) => {
+const convertCode = (code: string, options?: Options) => {
   let result = '';
-  convert({...options, sourceCode: code, onConverted: (file) => result += file.getFullText()});
+  convert({...options, sourceCode: code, onConverted: (file) => {
+    result += file.getFullText();
+  }});
   return result;
 }
 
 const convertFiles = (files: string | readonly string[]) => {
   let output = '';
-  convert({source: files, onConverted: (file) => output += file.getFullText()})
+  convert({source: files, onConverted: (file) => {
+    output += file.getFullText()
+  }})
   return output;
 };
 
@@ -252,4 +256,18 @@ test('it should convert parenthesis', () => {
     expect(convertCode(input)).toBe(output);
     expect(cmp(input, output, true)).toBe(true);
   }
+});
+
+test('it should support async', async () => {
+  const expected = 'Big(1).plus(1)';
+  let actual = '';
+  await convert({
+    sourceCode: '1 + 1',
+    onConverted: async (file) => {
+      const p = Promise.resolve(1);
+      await p;
+      actual = file.getText();
+    },
+  });
+  expect(actual).toBe(expected);
 });
