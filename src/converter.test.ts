@@ -103,6 +103,13 @@ describe('Convert comparisons', () => {
     expect(convertCode(input)).toBe(output);
     expect(cmp(input, output)).toBe(true);
   });
+
+  test('it should convert OR comparisons', () => {
+    const input = '0 || 1';
+    const output = 'Big(0 || 1)';
+    expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
+  });
 });
 
 describe('Convert Math library', () => {

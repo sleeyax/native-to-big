@@ -138,9 +138,15 @@ export class Converter {
         result += content;
       }
       else if (i == 1) {
-        const expr = mapSyntaxKind[child.getKind()];
-        if (!expr) throw new Error(`Expression of kind '${child.getKindName()}' is not supported!`);
-        result += '.' + expr;
+        const kind = child.getKind();
+
+        if (kind == SyntaxKind.BarBarToken) { // e.g. 0 || 1
+          return this.createBig(node.getText());
+        } else {
+          const expr = mapSyntaxKind[kind];
+          if (!expr) throw new Error(`Expression of kind '${child.getKindName()}' (${child.getText()}) is not supported!`);
+          result += '.' + expr;
+        }
       } else if (i == 2) {
         result +=  `(${content})`;
       } else {
