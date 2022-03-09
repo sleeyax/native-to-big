@@ -103,10 +103,19 @@ describe('Convert comparisons', () => {
     expect(convertCode(input)).toBe(output);
     expect(cmp(input, output)).toBe(true);
   });
+});
 
-  test('it should convert OR comparisons', () => {
+describe('Convert logical operators', () => {
+  test('it should convert OR', () => {
     const input = '0 || 1';
     const output = 'Big(0 || 1)';
+    expect(convertCode(input)).toBe(output);
+    expect(cmp(input, output, true)).toBe(true);
+  });
+
+  test('it should convert AND', () => {
+    const input = '0 && 1';
+    const output = 'Big(0 && 1)';
     expect(convertCode(input)).toBe(output);
     expect(cmp(input, output, true)).toBe(true);
   });
@@ -228,6 +237,12 @@ describe('Convert assignments', () => {
     const output = 'let total = Big(0); total = total.mod(Big(1).plus(2));';
     expect(convertCode(input, {variables: ['total']})).toBe(output);
   });
+
+  test('it should convert assingment', () => {
+    const input = 'let total = 0; total = 1 + 2;';
+    const output = 'let total = Big(0); total = total.plus(Big(1).plus(2));';
+    expect(convertCode(input, {variables: ['total']})).toBe(output);
+  });
 });
 
 test('it should include original source code', () => {
@@ -263,6 +278,12 @@ test('it should convert parenthesis', () => {
     expect(convertCode(input)).toBe(output);
     expect(cmp(input, output, true)).toBe(true);
   }
+});
+
+test('it should convert conditional expressions', () => {
+  const input = '(x > 2 ? 2 : 1)';
+  const output = '(Big(x).gt(2) ? 2 : 1)';
+  expect(convertCode(input)).toBe(output);
 });
 
 test('it should support async', async () => {

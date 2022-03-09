@@ -91,9 +91,24 @@ export class Converter {
     return result;
   }
 
-  private traverseParenthesizedExpression(node: Node) {
-    const binaryExpression = node.getChildAtIndexIfKindOrThrow(1, SyntaxKind.BinaryExpression); // index: 0 == OpenParenToken, 2 == CloseParenToken
-    return this.traverseBinaryExpression(binaryExpression);
+  private traverseParenthesizedExpression(node: Node): string {
+    let result = '';
+
+    for (const child of node.getChildren()) {
+      switch (child.getKind()) {
+        case SyntaxKind.BinaryExpression:
+          result += this.traverseBinaryExpression(child);
+          break;
+        case SyntaxKind.OpenParenToken:
+        case SyntaxKind.CloseParenToken:
+          break;
+        default:
+          result += this.traverseParenthesizedExpression(child);
+          break;
+      }
+    }
+
+    return result;
   }
 
   private traverseBinaryExpression(node: Node): string {
@@ -117,6 +132,7 @@ export class Converter {
             case SyntaxKind.SlashEqualsToken:
             case SyntaxKind.AsteriskEqualsToken:
             case SyntaxKind.PercentEqualsToken:
+            case SyntaxKind.EqualsToken:
               const identifierText = child.asKindOrThrow(SyntaxKind.Identifier).getText();
               content = `${identifierText} = ${identifierText}`; // e.g. 'total +=' -> 'total = total' (and then '.plus(...)' gets added later on)
               break;
@@ -140,15 +156,15 @@ export class Converter {
       else if (i == 1) {
         const kind = child.getKind();
 
-        if (kind == SyntaxKind.BarBarToken) { // e.g. 0 || 1
+        if (kind == SyntaxKind.BarBarToken || kind == SyntaxKind.AmpersandAmpersandToken) { // e.g. 0 || 1, 1 && 2
           return this.createBig(node.getText());
         } else {
           const expr = mapSyntaxKind[kind];
-          if (!expr) throw new Error(`Expression of kind '${child.getKindName()}' (${child.getText()}) is not supported!`);
+          if (!expr) throw new Error(`Expression of kind ${child.getKindName()} (${child.getText()}) is not supported! Node text: ${node.getText()}`);
           result += '.' + expr;
         }
       } else if (i == 2) {
-        result +=  `(${content})`;
+        result += `(${content})`;
       } else {
         // NOTE: this line shouldn't be reachable but let's append content instead of throwing an error
         result += content;
@@ -175,9 +191,10 @@ export class Converter {
               result += `.${method}()`;
               foundMath = true;
             }
-            else if (method === 'pow')
+            else
               // TODO: support Math.pow(value, power)
-              console.warn(`Found Math.pow in ${child.getSourceFile().getFilePath()}:${child.getStartLineNumber()} but it isn\'t supported! Skipping...`);
+              // TODO: what about other Math methods (min, max)?
+              console.warn(`Unsupported Math.${method}() found in ${child.getSourceFile().getFilePath()}:${child.getStartLineNumber()}! Skipping...`);
           }
 
           if (this.options.appendToNumber)
@@ -202,7 +219,7 @@ export class Converter {
           const firstChild = child.getFirstChildIfKind(SyntaxKind.BinaryExpression);
           if (firstChild) {
             const result = this.traverseBinaryExpression(firstChild);
-            child.replaceWithText(result);
+            child.replaceWithText(result);  
             break;
           }
         default:
